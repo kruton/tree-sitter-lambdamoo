@@ -17,13 +17,46 @@ jobs:
       attestations: true
   npm:
     uses: tree-sitter/workflows/.github/workflows/package-npm.yml@main
-    secrets:
-      NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
     with:
       generate: true
   crates:
-    uses: tree-sitter/workflows/.github/workflows/package-crates.yml@main
-    secrets:
-      CARGO_REGISTRY_TOKEN: ${{secrets.CARGO_REGISTRY_TOKEN}}
-    with:
-      generate: true
+    name: Publish package (crates.io)
+    runs-on: ubuntu-latest
+    environment:
+      name: crates
+      url: https://crates.io/crates/${{github.event.repository.name}}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+      - name: Set up Rust
+        uses: actions-rust-lang/setup-rust-toolchain@v1
+      - name: Set up tree-sitter CLI
+        uses: tree-sitter/setup-action/cli@v2
+      - name: Install dependencies
+        run: |-
+          if jq -e "$JQ_SCRIPT" package.json >/dev/null; then
+            npm i --ignore-scripts --omit peer --omit optional
+          fi
+        env:
+          JQ_SCRIPT: >-
+            .dependencies + .devDependencies |
+            with_entries(select(
+            (.key | startswith("tree-sitter-"))
+            and (.key != "tree-sitter-cli")
+            )) | length > 0
+      - name: Regenerate parser
+        run: |
+          while read -r grammar_dir; do
+            pushd "$grammar_dir"
+            tree-sitter generate
+            popd > /dev/null
+          done < <(jq -r '.grammars[].path // "."' tree-sitter.json)
+        env:
+          TREE_SITTER_ABI_VERSION: 15
+      - name: Authenticate with crates.io
+        uses: rust-lang/crates-io-auth-action@v1
+        id: auth
+      - name: Publish to crates.io
+        run: cargo publish
+        env:
+          CARGO_REGISTRY_TOKEN: ${{ steps.auth.outputs.token }}
