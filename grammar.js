@@ -37,6 +37,14 @@ const EXPRESSION_RULES = [
 // the public alias when the hidden rule has a simple production.
 const asPublic = (rule, publicRule) => alias(seq(rule), publicRule);
 
+/**
+ * Builds an expression rule, optionally prefixed or supporting the `$` (length) token.
+ *
+ * @param {GrammarSymbols} $ - The grammar rules object.
+ * @param {string} [prefix] - Prefix for rule lookup (e.g. '_subscript_').
+ * @param {boolean} [includeLength] - Whether to include the `$` (length) token in expressions.
+ * @returns {Rule} The combined expression rule choice.
+ */
 function makeExpression($, prefix = '', includeLength = false) {
   const expression = $[`${prefix}expression`];
   const expressions = EXPRESSION_RULES.map(name => {
@@ -56,6 +64,12 @@ function makeExpression($, prefix = '', includeLength = false) {
   );
 }
 
+/**
+ * Creates binary expression choices with full precedence levels matching LambdaMOO.
+ *
+ * @param {Rule} expr - The operand expression rule.
+ * @returns {Rule} The precedence-ordered binary expression choice rule.
+ */
 function makeBinaryExpression(expr) {
   // Precedence order matching LambdaMOO parser.y (lines 106-117):
   // Level 1 (loosest precedence):  || &&
