@@ -1,0 +1,38 @@
+==================
+Invalid Optional Argument in Function Call
+==================
+
+foo(?x);
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (call_expression
+          (identifier)
+          (ERROR)
+          (arg_list
+            (arg_item
+              (expression
+                (identifier)))))))))
+
+==================
+Invalid Standalone Length in If
+==================
+
+if ($)
+  $;
+endif
+
+---
+
+(source_file
+  (statement
+    (if_statement
+      (expression
+        (prop_access
+          (MISSING identifier)))
+      (ERROR)
+      (statement))))

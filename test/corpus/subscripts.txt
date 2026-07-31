@@ -1,0 +1,137 @@
+==================
+Index Access with Length
+==================
+
+x[$];
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (index_access
+          (expression
+            (identifier))
+          (length))))))
+
+==================
+Range Access with Length
+==================
+
+x[1..$];
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (range_access
+          (expression
+            (identifier))
+          (number)
+          (length))))))
+
+==================
+Subscript Binary Expression with Length
+==================
+
+x[$ - 1];
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (index_access
+          (expression
+            (identifier))
+          (binary_expression
+            (length)
+            (number)))))))
+
+==================
+Subscript Catch Codes with Length
+==================
+
+x[`foo ! $'];
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (index_access
+          (expression
+            (identifier))
+          (catch_expression
+            (identifier)
+            (codes
+              (arg_list
+                (arg_item
+                  (length))))))))))
+
+==================
+Subscript Call Expression Retains Its Node
+==================
+
+x[f()];
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (index_access
+          (expression
+            (identifier))
+          (call_expression
+            (identifier)))))))
+
+==================
+Subscript List Literal Retains Its Nodes
+==================
+
+x[{1, 2}];
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (index_access
+          (expression
+            (identifier))
+          (list_literal
+            (arg_list
+              (arg_item
+                (number))
+              (arg_item
+                (number)))))))))
+
+==================
+Subscript Catch Expression Retains Its Node
+==================
+
+x[`foo ! E_TYPE'];
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (index_access
+          (expression
+            (identifier))
+          (catch_expression
+            (identifier)
+            (codes
+              (arg_list
+                (arg_item
+                  (error))))))))))

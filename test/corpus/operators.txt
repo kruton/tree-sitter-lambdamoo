@@ -1,0 +1,43 @@
+==================
+Bitwise OR vs Equals Precedence
+==================
+
+a |. b == c;
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (binary_expression
+          (expression
+            (binary_expression
+              (expression
+                (identifier))
+              (expression
+                (identifier))))
+          (expression
+            (identifier)))))))
+
+==================
+Logical OR vs Logical AND Equal Precedence
+==================
+
+a || b && c;
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (binary_expression
+          (expression
+            (binary_expression
+              (expression
+                (identifier))
+              (expression
+                (identifier))))
+          (expression
+            (identifier)))))))
