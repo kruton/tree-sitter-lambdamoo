@@ -32,9 +32,10 @@
   "devDependencies": {
     "eslint": "^10.8.0",
     "eslint-config-treesitter": "^1.0.0",
+    "globals": "^17.8.0",
     "prebuildify": "^6.0.1",
     "tree-sitter": "^0.25.1",
-    "tree-sitter-cli": "^0.24.4"
+    "tree-sitter-cli": "^0.26.11"
   },
   "peerDependencies": {
     "tree-sitter": "^0.21.1"
@@ -46,6 +47,7 @@
   },
   "scripts": {
     "install": "node-gyp-build",
+    "lint": "eslint",
     "prestart": "tree-sitter build --wasm",
     "start": "tree-sitter playground",
     "test": "tree-sitter test && node --test bindings/node/*_test.js"
