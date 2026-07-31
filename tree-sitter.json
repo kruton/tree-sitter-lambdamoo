@@ -1,0 +1,34 @@
+{
+  "grammars": [
+    {
+      "name": "lambdamoo",
+      "camelcase": "LambdaMOO",
+      "scope": "source.lambdamoo",
+      "path": ".",
+      "file-types": [
+        "moo"
+      ],
+      "highlights": "queries/highlights.scm",
+      "injection-regex": "lambdamoo"
+    }
+  ],
+  "metadata": {
+    "version": "0.1.0",
+    "license": "MIT",
+    "description": "LambdaMOO grammar for tree-sitter",
+    "authors": [
+      {
+        "name": "Kenny Root",
+        "email": "kenny@the-b.org"
+      }
+    ],
+    "links": {
+      "repository": "https://github.com/kruton/tree-sitter-lambdamoo"
+    }
+  },
+  "bindings": {
+    "c": true,
+    "node": true,
+    "rust": true
+  }
+}
