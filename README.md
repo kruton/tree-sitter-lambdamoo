@@ -1,4 +1,4 @@
-# Tree-sitter LambdaMOO (`tree-sitter-lambdamoo`)
+# Tree-sitter LambdaMOO
 
 A [Tree-sitter](https://tree-sitter.github.io/tree-sitter/) grammar and parser for the **LambdaMOO** (MOO) scripting language.
 
@@ -24,7 +24,7 @@ Key files:
 
 To build and contribute to this repository, ensure you have the following installed:
 
-- **Node.js** (v18+ recommended) and `npm`
+- **Node.js** and `npm`
 - **Rust Toolchain** (`cargo`, `rustc`) for building and testing Rust bindings
 - **C Compiler** (`gcc`, `clang`, or MSVC) for building native parser binaries
 - **Tree-sitter CLI**: Can be run via `npx tree-sitter` or installed globally:
