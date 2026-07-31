@@ -1,8 +1,29 @@
 # Tree-sitter LambdaMOO
 
+[![npm version](https://img.shields.io/npm/v/tree-sitter-lambdamoo.svg)](https://www.npmjs.com/package/tree-sitter-lambdamoo)
+[![crates.io](https://img.shields.io/crates/v/tree-sitter-lambdamoo.svg)](https://crates.io/crates/tree-sitter-lambdamoo)
+
 A [Tree-sitter](https://tree-sitter.github.io/tree-sitter/) grammar and parser for the **LambdaMOO** (MOO) scripting language.
 
 This project enables fast, incremental parsing and syntax analysis of MOO code, suitable for syntax highlighting, code navigation, language servers, and editor integration (e.g., Neovim, Helix, Zed, VS Code).
+
+---
+
+## Installation
+
+`tree-sitter-lambdamoo` is published on [npmjs](https://www.npmjs.com/package/tree-sitter-lambdamoo) and [crates.io](https://crates.io/crates/tree-sitter-lambdamoo), so you can include it directly in your project dependencies without referencing local directory paths.
+
+### Node.js (npm)
+
+```bash
+npm install tree-sitter-lambdamoo
+```
+
+### Rust (Cargo)
+
+```bash
+cargo add tree-sitter-lambdamoo
+```
 
 ---
 
@@ -14,7 +35,7 @@ The grammar ([grammar.js](./grammar.js)) supports standard LambdaMOO syntax.
 
 Key files:
 - [grammar.js](./grammar.js): Edit this file to add or modify grammar rules.
-- [highlights.scm](./highlights.scm): Queries mapping AST nodes to syntax highlight capture groups.
+- [queries/highlights.scm](./queries/highlights.scm): Queries mapping AST nodes to syntax highlight capture groups.
 - [bindings/rust/lib.rs](./bindings/rust/lib.rs): Rust API integration.
 - [bindings/node/index.js](./bindings/node/index.js): Node.js native module loader.
 
@@ -93,7 +114,7 @@ Add `tree-sitter-lambdamoo` and `tree-sitter` to your `Cargo.toml`:
 ```toml
 [dependencies]
 tree-sitter = "0.26"
-tree-sitter-lambdamoo = { path = "path/to/moo-tree-sitter" }
+tree-sitter-lambdamoo = "0.1"
 ```
 
 In your Rust code:
@@ -103,8 +124,8 @@ use tree_sitter::Parser;
 
 fn main() {
     let mut parser = Parser::new();
-    let language = tree_sitter_lambdamoo::language();
-    parser.set_language(&language).expect("Error loading LambdaMOO grammar");
+    let language = tree_sitter_lambdamoo::LANGUAGE;
+    parser.set_language(&language.into()).expect("Error loading LambdaMOO grammar");
 
     let source_code = r#"
         if (player.wizard)
@@ -118,6 +139,14 @@ fn main() {
 ```
 
 ### Node.js Integration
+
+Install the package via npm:
+
+```bash
+npm install tree-sitter-lambdamoo
+```
+
+In JavaScript:
 
 ```javascript
 const Parser = require('tree-sitter');
