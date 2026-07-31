@@ -1,0 +1,59 @@
+==================
+Scattering Assignment with Optional and Rest Variables
+==================
+
+{a, ?b = 1, @c} = x;
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (scattering_assignment
+          (scatter_list
+            (identifier)
+            (identifier)
+            (expression
+              (number))
+            (identifier))
+          (expression
+            (identifier)))))))
+
+==================
+Scattering Assignment with Required Variables Only
+==================
+
+{a, b} = x;
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (scattering_assignment
+          (scatter_list
+            (identifier)
+            (identifier))
+          (expression
+            (identifier)))))))
+
+==================
+Scattering Assignment with Required and Rest Variables
+==================
+
+{a, @b} = x;
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (scattering_assignment
+          (scatter_list
+            (identifier)
+            (identifier))
+          (expression
+            (identifier)))))))

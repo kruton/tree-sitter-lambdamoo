@@ -1,0 +1,19 @@
+==================
+If Statement with Valid Expression
+==================
+
+if (x)
+  y;
+endif
+
+---
+
+(source_file
+  (statement
+    (if_statement
+      (expression
+        (identifier))
+      (statement
+        (expression_statement
+          (expression
+            (identifier)))))))

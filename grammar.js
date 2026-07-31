@@ -18,8 +18,121 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+const EXPRESSION_RULES = [
+  'scattering_assignment',
+  'assignment',
+  'ternary_expression',
+  'binary_expression',
+  'unary_expression',
+  'range_access',
+  'index_access',
+  'verb_call',
+  'prop_access',
+  'call_expression',
+  'catch_expression',
+  'list_literal',
+];
+
+// Wrapping the hidden rule in `seq` prevents Tree-sitter from optimizing away
+// the public alias when the hidden rule has a simple production.
+const asPublic = (rule, publicRule) => alias(seq(rule), publicRule);
+
+function makeExpression($, prefix = '', includeLength = false) {
+  const expression = $[`${prefix}expression`];
+  const expressions = EXPRESSION_RULES.map(name => {
+    const rule = $[`${prefix}${name}`];
+    return prefix ? asPublic(rule, $[name]) : rule;
+  });
+
+  return choice(
+    ...expressions,
+    $.identifier,
+    $.number,
+    $.string,
+    $.object,
+    $.error,
+    ...(includeLength ? [$.length] : []),
+    seq('(', expression, ')'),
+  );
+}
+
+function makeBinaryExpression(expr) {
+  // Precedence order matching LambdaMOO parser.y (lines 106-117):
+  // Level 1 (loosest precedence):  || &&
+  // Level 2:                       == != < <= > >= in
+  // Level 3:                       |.
+  // Level 4:                       ^.
+  // Level 5:                       &.
+  // Level 6:                       << >> >>>
+  // Level 7:                       + -
+  // Level 8:                       * / %
+  // Level 9 (tightest precedence): ^ (right associative)
+  const table = [
+    [prec.left, 1, choice('||', '&&')],
+    [prec.left, 2, choice('==', '!=', '<', '<=', '>', '>=')],
+    [prec.left, 2, 'in'],
+    [prec.left, 3, '|.'],
+    [prec.left, 4, '^.'],
+    [prec.left, 5, '&.'],
+    [prec.left, 6, choice('<<', '>>', '>>>')],
+    [prec.left, 7, choice('+', '-')],
+    [prec.left, 8, choice('*', '/', '%')],
+    [prec.right, 9, '^'],
+  ];
+
+  return choice(...table.map(([assoc, p, op]) =>
+    assoc(p, seq(expr, op, expr)),
+  ));
+}
+
+const makeAssignment = expr => prec.right(1, seq(expr, '=', expr));
+const makeScatteringAssignment = ($, expr, prefix = '') => prec.dynamic(1,
+  prec.right(2, seq('{', $[`${prefix}scatter_list`], '}', '=', expr)),
+);
+
+const makeTernaryExpression = expr => prec.right(2, seq(expr, '?', expr, '|', expr));
+const makeUnaryExpression = expr => prec(12, choice(
+  seq('!', expr),
+  seq('~', expr),
+  seq('-', expr),
+));
+const makeRangeAccess = (expr, subscript) => prec(13, seq(expr, '[', subscript, '..', subscript, ']'));
+const makeIndexAccess = (expr, subscript) => prec(13, seq(expr, '[', subscript, ']'));
+const makeVerbCall = ($, expr, argList) => prec(13, choice(
+  seq(expr, ':', $.identifier, '(', optional(argList), ')'),
+  seq(expr, ':', '(', expr, ')', '(', optional(argList), ')'),
+  seq('$', $.identifier, '(', optional(argList), ')'),
+));
+const makePropAccess = ($, expr) => prec(13, choice(
+  seq('$', $.identifier),
+  seq(expr, '.', $.identifier),
+  seq(expr, '.', '(', expr, ')'),
+));
+const makeCallExpression = ($, argList) => prec(13, seq($.identifier, '(', optional(argList), ')'));
+const makeArgList = argItem => seq(argItem, repeat(seq(',', argItem)));
+const makeArgItem = ($, expr) => choice(
+  expr,
+  seq('@', expr),
+);
+
+const makeScatterList = ($, expr) => seq(makeScatterItem($, expr), repeat(seq(',', makeScatterItem($, expr))));
+const makeScatterItem = ($, expr) => choice(
+  $.identifier,
+  seq('@', $.identifier),
+  seq('?', $.identifier),
+  seq('?', $.identifier, '=', expr),
+);
+
+const makeListLiteral = argList => seq('{', optional(argList), '}');
+const makeCatchExpression = (expr, codes) => seq('`', expr, '!', codes, optional(seq('=>', expr)), '\'');
+
 module.exports = grammar({
   name: 'lambdamoo',
+
+  conflicts: $ => [
+    [$.expression, $.scatter_list],
+    [$._subscript_expression, $._subscript_scatter_list],
+  ],
 
   extras: $ => [
     /\s/, // skip whitespace
@@ -95,101 +208,74 @@ module.exports = grammar({
       repeat($.statement),
     ),
 
-    codes: $ => choice(
-      'ANY',
-      $.arg_list,
-    ),
+    codes: $ => choice('ANY', $.arg_list),
+    _subscript_codes: $ => choice('ANY', asPublic($._subscript_arg_list, $.arg_list)),
 
     // --- Expressions (Precedence ordered in choice) ---
-    expression: $ => choice(
-      $.assignment,
-      $.ternary_expression,
-      $.binary_expression,
-      $.unary_expression,
-      $.range_access,
-      $.index_access,
-      $.verb_call,
-      $.prop_access,
-      $.call_expression,
-      $.catch_expression,
-      $.list_literal,
-      $.identifier,
-      $.number,
-      $.string,
-      $.object,
-      $.error,
-      '$', // length
-      seq('(', $.expression, ')'),
-    ),
+    expression: $ => makeExpression($),
+
+    length: $ => '$',
+
+    _subscript_expression: $ => makeExpression($, '_subscript_', true),
 
     // Level 1: Assignment (Right associative)
-    assignment: $ => prec.right(1, seq($.expression, '=', $.expression)),
+    assignment: $ => makeAssignment($.expression),
+    _subscript_assignment: $ => makeAssignment($._subscript_expression),
+
+    scattering_assignment: $ => makeScatteringAssignment($, $.expression, ''),
+    _subscript_scattering_assignment: $ => prec.dynamic(1, prec.right(2, seq(
+      '{', asPublic($._subscript_scatter_list, $.scatter_list), '}', '=', $._subscript_expression,
+    ))),
+
+    scatter_list: $ => makeScatterList($, $.expression),
+    _subscript_scatter_list: $ => makeScatterList($, $._subscript_expression),
+
+    scatter_item: $ => makeScatterItem($, $.expression),
+    _subscript_scatter_item: $ => makeScatterItem($, $._subscript_expression),
 
     // Level 1: Ternary (Right associative)
-    ternary_expression: $ => prec.right(1, seq($.expression, '?', $.expression, '|', $.expression)),
+    ternary_expression: $ => makeTernaryExpression($.expression),
+    _subscript_ternary_expression: $ => makeTernaryExpression($._subscript_expression),
 
     // Levels 2-12: Binary Operators
-    binary_expression: $ => {
-      const table = [
-        [prec.left, 2, '||'],
-        [prec.left, 3, '&&'],
-        [prec.left, 4, '|.'],
-        [prec.left, 5, '^.'],
-        [prec.left, 6, '&.'],
-        [prec.left, 7, choice('==', '!=')],
-        [prec.left, 8, choice('<', '<=', '>', '>=', 'in')],
-        [prec.left, 9, choice('<<', '>>', '>>>')],
-        [prec.left, 10, choice('+', '-')],
-        [prec.left, 11, choice('*', '/', '%')],
-        [prec.right, 12, '^'],
-      ];
-
-      return choice(...table.map(([assoc, p, op]) =>
-        assoc(p, seq($.expression, op, $.expression)),
-      ));
-    },
+    binary_expression: $ => makeBinaryExpression($.expression),
+    _subscript_binary_expression: $ => makeBinaryExpression($._subscript_expression),
 
     // Level 13: Unary Operators
-    unary_expression: $ => prec(13, choice(
-      seq('!', $.expression),
-      seq('~', $.expression),
-      seq('-', $.expression),
-    )),
+    unary_expression: $ => makeUnaryExpression($.expression),
+    _subscript_unary_expression: $ => makeUnaryExpression($._subscript_expression),
 
     // Level 14: Postfix Operations (Highest precedence)
-    range_access: $ => prec(14, seq($.expression, '[', $.expression, '..', $.expression, ']')),
-    index_access: $ => prec(14, seq($.expression, '[', $.expression, ']')),
+    range_access: $ => makeRangeAccess($.expression, $._subscript_expression),
+    _subscript_range_access: $ => makeRangeAccess($._subscript_expression, $._subscript_expression),
 
-    verb_call: $ => prec(14, choice(
-      seq($.expression, ':', $.identifier, '(', optional($.arg_list), ')'),
-      seq($.expression, ':', '(', $.expression, ')', '(', optional($.arg_list), ')'),
-      seq('$', $.identifier, '(', optional($.arg_list), ')'),
-    )),
+    index_access: $ => makeIndexAccess($.expression, $._subscript_expression),
+    _subscript_index_access: $ => makeIndexAccess($._subscript_expression, $._subscript_expression),
 
-    prop_access: $ => prec(14, choice(
-      seq('$', $.identifier),
-      seq($.expression, '.', $.identifier),
-      seq($.expression, '.', '(', $.expression, ')'),
-    )),
+    verb_call: $ => makeVerbCall($, $.expression, $.arg_list),
+    _subscript_verb_call: $ => makeVerbCall($, $._subscript_expression, asPublic($._subscript_arg_list, $.arg_list)),
 
-    call_expression: $ => prec(14, seq($.identifier, '(', optional($.arg_list), ')')),
+    prop_access: $ => makePropAccess($, $.expression),
+    _subscript_prop_access: $ => makePropAccess($, $._subscript_expression),
+
+    call_expression: $ => makeCallExpression($, $.arg_list),
+    _subscript_call_expression: $ => makeCallExpression($, asPublic($._subscript_arg_list, $.arg_list)),
 
     // --- Helper rules for expressions ---
-    arg_list: $ => seq(
-      $.arg_item,
-      repeat(seq(',', $.arg_item)),
+    arg_list: $ => makeArgList($.arg_item),
+    _subscript_arg_list: $ => makeArgList(asPublic($._subscript_arg_item, $.arg_item)),
+
+    arg_item: $ => makeArgItem($, $.expression),
+    _subscript_arg_item: $ => makeArgItem($, $._subscript_expression),
+
+    list_literal: $ => makeListLiteral($.arg_list),
+    _subscript_list_literal: $ => makeListLiteral(asPublic($._subscript_arg_list, $.arg_list)),
+
+    catch_expression: $ => makeCatchExpression($.expression, $.codes),
+    _subscript_catch_expression: $ => makeCatchExpression(
+      $._subscript_expression,
+      asPublic($._subscript_codes, $.codes),
     ),
-
-    arg_item: $ => choice(
-      $.expression,
-      seq('@', $.expression),
-      seq('?', $.identifier),
-      seq('?', $.identifier, '=', $.expression),
-    ),
-
-    list_literal: $ => seq('{', optional($.arg_list), '}'),
-
-    catch_expression: $ => seq('`', $.expression, '!', $.codes, optional(seq('=>', $.expression)), '\''),
 
     // --- Primitives / Literals ---
     identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
