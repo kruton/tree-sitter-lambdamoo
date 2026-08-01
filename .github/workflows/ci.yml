@@ -52,6 +52,9 @@ jobs:
       - name: Set up tree-sitter
         uses: tree-sitter/setup-action/cli@1868a545ffb91bdc221d14a168b5b6d8de4a28b3 # v2
 
+      - name: Check version consistency
+        run: ./scripts/check-versions.sh
+
       - name: Run tests
         uses: tree-sitter/parser-test-action@05f6ce7c7e54603c45cd87ed926725dc870bcc63 # v3
         with:
