@@ -95,7 +95,7 @@ jobs:
   npm:
     name: Publish NodeJS package
     needs: [build_wasm, build_node]
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       id-token: write
@@ -111,6 +111,10 @@ jobs:
           cache: npm
           node-version: 22
           registry-url: https://registry.npmjs.org/
+      - name: Upgrade npm CLI
+        run: npm install -g npm@latest
+      - name: Clean .npmrc for OIDC
+        run: sed -i '/_authToken/d' ~/.npmrc || true
       - name: Download binaries
         uses: actions/download-artifact@v4
         with:
