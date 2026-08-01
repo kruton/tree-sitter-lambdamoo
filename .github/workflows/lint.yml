@@ -8,12 +8,14 @@ on:
       - package.json
       - package-lock.json
       - eslint.config.js
+      - .github/workflows/**
   pull_request:
     paths:
       - grammar.js
       - package.json
       - package-lock.json
       - eslint.config.js
+      - .github/workflows/**
 
 jobs:
   lint:
