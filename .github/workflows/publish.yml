@@ -19,7 +19,7 @@ jobs:
     with:
       generate: true
     secrets:
-      NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
+      NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
   crates:
     name: Publish package (crates.io)
     runs-on: ubuntu-latest
