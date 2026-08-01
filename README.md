@@ -25,6 +25,12 @@ npm install tree-sitter-lambdamoo
 cargo add tree-sitter-lambdamoo
 ```
 
+### Go
+
+```bash
+go get github.com/kruton/tree-sitter-lambdamoo
+```
+
 ---
 
 ## Features & Grammar Coverage
@@ -38,6 +44,7 @@ Key files:
 - [queries/highlights.scm](./queries/highlights.scm): Queries mapping AST nodes to syntax highlight capture groups.
 - [bindings/rust/lib.rs](./bindings/rust/lib.rs): Rust API integration.
 - [bindings/node/index.js](./bindings/node/index.js): Node.js native module loader.
+- [bindings/go/binding.go](./bindings/go/binding.go): Go API integration.
 
 ---
 
@@ -84,6 +91,13 @@ To test the Rust binding and verify that `parser.c` compiles cleanly with C comp
 
 ```bash
 cargo test
+```
+
+#### Go Tests
+To test the Go bindings:
+
+```bash
+go test ./bindings/go/...
 ```
 
 #### Tree-sitter Corpus Tests
@@ -158,6 +172,42 @@ parser.setLanguage(LambdaMOO);
 const sourceCode = 'return player:location();';
 const tree = parser.parse(sourceCode);
 console.log(tree.root_node.toString());
+```
+
+### Go Integration
+
+Install the packages:
+
+```bash
+go get github.com/tree-sitter/go-tree-sitter
+go get github.com/kruton/tree-sitter-lambdamoo
+```
+
+In Go:
+
+```go
+package main
+
+import (
+	"fmt"
+
+	tree_sitter "github.com/tree-sitter/go-tree-sitter"
+	tree_sitter_lambdamoo "github.com/kruton/tree-sitter-lambdamoo/bindings/go"
+)
+
+func main() {
+	parser := tree_sitter.NewParser()
+	defer parser.Close()
+
+	language := tree_sitter.NewLanguage(tree_sitter_lambdamoo.Language())
+	parser.SetLanguage(language)
+
+	sourceCode := []byte("return player:location();")
+	tree := parser.Parse(sourceCode, nil)
+	defer tree.Close()
+
+	fmt.Println(tree.RootNode().ToSexp())
+}
 ```
 
 ---
