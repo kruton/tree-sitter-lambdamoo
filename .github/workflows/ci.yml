@@ -9,6 +9,8 @@ on:
       - test/**
       - bindings/**
       - binding.gyp
+      - go.mod
+      - go.sum
   pull_request:
     paths:
       - grammar.js
@@ -16,6 +18,8 @@ on:
       - test/**
       - bindings/**
       - binding.gyp
+      - go.mod
+      - go.sum
 
 concurrency:
   group: ${{github.workflow}}-${{github.ref}}
@@ -39,5 +43,6 @@ jobs:
       - name: Run tests
         uses: tree-sitter/parser-test-action@05f6ce7c7e54603c45cd87ed926725dc870bcc63 # v3
         with:
+          test-go: true
           test-rust: true
           test-node: true
