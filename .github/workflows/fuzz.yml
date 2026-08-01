@@ -6,10 +6,18 @@ on:
     paths:
       - grammar.js
       - src/**
+      - Cargo.toml
+      - Cargo.lock
+      - package.json
+      - package-lock.json
   pull_request:
     paths:
       - grammar.js
       - src/**
+      - Cargo.toml
+      - Cargo.lock
+      - package.json
+      - package-lock.json
 
 jobs:
   fuzz:

@@ -9,8 +9,13 @@ on:
       - test/**
       - bindings/**
       - binding.gyp
+      - Cargo.toml
+      - Cargo.lock
       - go.mod
       - go.sum
+      - package.json
+      - package-lock.json
+      - tree-sitter.json
   pull_request:
     paths:
       - grammar.js
@@ -18,8 +23,13 @@ on:
       - test/**
       - bindings/**
       - binding.gyp
+      - Cargo.toml
+      - Cargo.lock
       - go.mod
       - go.sum
+      - package.json
+      - package-lock.json
+      - tree-sitter.json
 
 concurrency:
   group: ${{github.workflow}}-${{github.ref}}

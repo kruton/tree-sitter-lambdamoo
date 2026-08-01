@@ -5,9 +5,15 @@ on:
     branches: [main, master]
     paths:
       - grammar.js
+      - package.json
+      - package-lock.json
+      - eslint.config.js
   pull_request:
     paths:
       - grammar.js
+      - package.json
+      - package-lock.json
+      - eslint.config.js
 
 jobs:
   lint:
