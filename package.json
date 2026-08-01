@@ -2,7 +2,10 @@
   "name": "tree-sitter-lambdamoo",
   "version": "0.1.1",
   "description": "LambdaMOO grammar for tree-sitter",
-  "repository": "https://github.com/kruton/tree-sitter-lambdamoo",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kruton/tree-sitter-lambdamoo.git"
+  },
   "license": "MIT",
   "author": {
     "name": "Kenny Root",
