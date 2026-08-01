@@ -18,7 +18,8 @@ jobs:
     uses: tree-sitter/workflows/.github/workflows/package-npm.yml@main
     with:
       generate: true
-    secrets: inherit
+    secrets:
+      NODE_AUTH_TOKEN: ${{ secrets.NODE_AUTH_TOKEN || secrets.GITHUB_TOKEN }}
   crates:
     name: Publish package (crates.io)
     runs-on: ubuntu-latest
