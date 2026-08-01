@@ -99,7 +99,7 @@ function makeBinaryExpression(expr) {
   ));
 }
 
-const makeAssignment = expr => prec.right(1, seq(expr, '=', expr));
+const makeAssignment = (target, expr) => prec.right(1, seq(target, '=', expr));
 const makeScatteringAssignment = ($, expr, prefix = '') => prec.dynamic(1,
   prec.right(2, seq('{', $[`${prefix}scatter_list`], '}', '=', expr)),
 );
@@ -233,8 +233,18 @@ module.exports = grammar({
     _subscript_expression: $ => makeExpression($, '_subscript_', true),
 
     // Level 1: Assignment (Right associative)
-    assignment: $ => makeAssignment($.expression),
-    _subscript_assignment: $ => makeAssignment($._subscript_expression),
+    assignment: $ => makeAssignment(
+      choice($.identifier, $.prop_access, $.index_access),
+      $.expression,
+    ),
+    _subscript_assignment: $ => makeAssignment(
+      choice(
+        $.identifier,
+        asPublic($._subscript_prop_access, $.prop_access),
+        asPublic($._subscript_index_access, $.index_access),
+      ),
+      $._subscript_expression,
+    ),
 
     scattering_assignment: $ => makeScatteringAssignment($, $.expression, ''),
     _subscript_scattering_assignment: $ => prec.dynamic(1, prec.right(2, seq(
