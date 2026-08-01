@@ -16,6 +16,7 @@ on:
       - package.json
       - package-lock.json
       - tree-sitter.json
+      - .github/workflows/**
   pull_request:
     paths:
       - grammar.js
@@ -30,6 +31,7 @@ on:
       - package.json
       - package-lock.json
       - tree-sitter.json
+      - .github/workflows/**
 
 concurrency:
   group: ${{github.workflow}}-${{github.ref}}
