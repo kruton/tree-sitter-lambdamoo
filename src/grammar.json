@@ -872,8 +872,21 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "expression"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "prop_access"
+              },
+              {
+                "type": "SYMBOL",
+                "name": "index_access"
+              }
+            ]
           },
           {
             "type": "STRING",
@@ -893,8 +906,41 @@
         "type": "SEQ",
         "members": [
           {
-            "type": "SYMBOL",
-            "name": "_subscript_expression"
+            "type": "CHOICE",
+            "members": [
+              {
+                "type": "SYMBOL",
+                "name": "identifier"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_subscript_prop_access"
+                    }
+                  ]
+                },
+                "named": true,
+                "value": "prop_access"
+              },
+              {
+                "type": "ALIAS",
+                "content": {
+                  "type": "SEQ",
+                  "members": [
+                    {
+                      "type": "SYMBOL",
+                      "name": "_subscript_index_access"
+                    }
+                  ]
+                },
+                "named": true,
+                "value": "index_access"
+              }
+            ]
           },
           {
             "type": "STRING",

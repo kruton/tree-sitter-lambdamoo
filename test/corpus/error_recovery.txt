@@ -36,3 +36,35 @@ endif
           (MISSING identifier)))
       (ERROR)
       (statement))))
+
+==================
+Optional Scatter Default Requires Question Mark
+==================
+
+{target, source, message, type = "chat"} = args;
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (list_literal
+          (arg_list
+            (arg_item
+              (expression
+                (identifier)))
+            (arg_item
+              (expression
+                (identifier)))
+            (arg_item
+              (expression
+                (identifier)))
+            (arg_item
+              (expression
+                (assignment
+                  (identifier)
+                  (expression
+                    (string))))))))
+      (ERROR
+        (identifier)))))

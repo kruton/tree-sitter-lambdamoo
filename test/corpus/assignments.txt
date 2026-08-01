@@ -21,6 +21,29 @@ Scattering Assignment with Optional and Rest Variables
             (identifier)))))))
 
 ==================
+Scattering Assignment with Optional Default
+==================
+
+{target, source, message, ?type = "chat"} = args;
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (scattering_assignment
+          (scatter_list
+            (identifier)
+            (identifier)
+            (identifier)
+            (identifier)
+            (expression
+              (string)))
+          (expression
+            (identifier)))))))
+
+==================
 Scattering Assignment with Required Variables Only
 ==================
 
