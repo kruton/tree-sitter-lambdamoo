@@ -10,6 +10,12 @@ fn main() {
         .flag_if_supported("-Wno-unused-but-set-variable")
         .flag_if_supported("-Wno-trigraphs");
 
+    if std::env::var("TARGET").is_ok_and(|target| target.starts_with("wasm32-unknown")) {
+        let wasm_headers = std::env::var("DEP_TREE_SITTER_LANGUAGE_WASM_HEADERS")
+            .expect("tree-sitter-language must provide headers for wasm32-unknown targets");
+        c_config.include(wasm_headers);
+    }
+
     #[cfg(target_env = "msvc")]
     c_config.flag("-utf-8");
 
