@@ -11,13 +11,26 @@ permissions:
   attestations: write
 
 jobs:
+  check_versions:
+    name: Check version consistency
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - name: Check version consistency
+        run: ./scripts/check-versions.sh
+
   github:
+    needs: [check_versions]
     uses: tree-sitter/workflows/.github/workflows/release.yml@main
     with:
       generate: true
 
   build_wasm:
     name: Build Wasm binaries
+    needs: [check_versions]
     runs-on: ubuntu-24.04
     continue-on-error: true
     steps:
@@ -53,6 +66,7 @@ jobs:
 
   build_node:
     name: Build NodeJS binaries on ${{matrix.os}}
+    needs: [check_versions]
     runs-on: ${{matrix.os}}
     strategy:
       matrix:
@@ -95,7 +109,7 @@ jobs:
 
   npm:
     name: Publish NodeJS package
-    needs: [build_wasm, build_node]
+    needs: [check_versions, build_wasm, build_node]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -132,6 +146,7 @@ jobs:
 
   crates:
     name: Publish package (crates.io)
+    needs: [check_versions]
     runs-on: ubuntu-latest
     environment:
       name: crates

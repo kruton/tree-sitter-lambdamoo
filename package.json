@@ -49,6 +49,7 @@
     }
   },
   "scripts": {
+    "check-versions": "./scripts/check-versions.sh",
     "install": "node-gyp-build",
     "lint": "eslint",
     "prestart": "tree-sitter build --wasm",
