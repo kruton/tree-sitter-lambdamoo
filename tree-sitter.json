@@ -9,6 +9,11 @@
         "moo"
       ],
       "highlights": "queries/highlights.scm",
+      "folds": "queries/folds.scm",
+      "indents": "queries/indents.scm",
+      "tags": "queries/tags.scm",
+      "locals": "queries/locals.scm",
+      "errors": "queries/errors.scm",
       "injection-regex": "lambdamoo"
     }
   ],
