@@ -38,7 +38,7 @@
     "globals": "^17.8.0",
     "prebuildify": "^6.0.1",
     "tree-sitter": "^0.25.1",
-    "tree-sitter-cli": "^0.26.11"
+    "tree-sitter-cli": "^0.26.12"
   },
   "peerDependencies": {
     "tree-sitter": "^0.21.1 || ^0.25.1"
@@ -58,6 +58,6 @@
   },
   "allowScripts": {
     "tree-sitter@0.25.1": true,
-    "tree-sitter-cli@0.26.11": true
+    "tree-sitter-cli@0.26.12": true
   }
 }
