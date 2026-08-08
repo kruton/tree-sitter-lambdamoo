@@ -157,7 +157,7 @@ jobs:
       - name: Set up Rust
         uses: actions-rust-lang/setup-rust-toolchain@166cdcfd11aee3cb47222f9ddb555ce30ddb9659 # v1.17.0
       - name: Set up tree-sitter CLI
-        uses: tree-sitter/setup-action/cli@1868a545ffb91bdc221d14a168b5b6d8de4a28b3 # v2
+        uses: tree-sitter/setup-action/cli@49f8c1f20b60102eae8c033bb7c7f6cd056f6086 # v2
       - name: Install dependencies
         run: |-
           if jq -e "$JQ_SCRIPT" package.json >/dev/null; then
