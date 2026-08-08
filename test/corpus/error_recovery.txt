@@ -68,3 +68,72 @@ Optional Scatter Default Requires Question Mark
                     (string))))))))
       (ERROR
         (identifier)))))
+
+==================
+Keyword in Function Call Argument
+==================
+
+notify(if);
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (call_expression
+          (identifier)
+          (arg_list
+            (arg_item
+              (expression
+                (error)))))))))
+
+==================
+Keyword in For Loop Variable
+==================
+
+for if in (x)
+endfor
+
+---
+
+(source_file
+  (statement
+    (for_statement
+      (error)
+      (expression
+        (identifier)))))
+
+==================
+Keyword in Direct Property Access
+==================
+
+me.if;
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (prop_access
+          (expression
+            (identifier))
+          (error))))))
+
+==================
+Keyword in Direct Verb Call
+==================
+
+me:if();
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (verb_call
+          (expression
+            (identifier))
+          (error))))))

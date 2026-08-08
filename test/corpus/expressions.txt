@@ -1,0 +1,35 @@
+==================
+Dynamic Property Access with Keyword String
+==================
+
+me.("if");
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (prop_access
+          (expression
+            (identifier))
+          (expression
+            (string)))))))
+
+==================
+Dynamic Verb Call with Keyword String
+==================
+
+me:("if")();
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (verb_call
+          (expression
+            (identifier))
+          (expression
+            (string)))))))
