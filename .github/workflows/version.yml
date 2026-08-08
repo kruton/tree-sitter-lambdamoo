@@ -51,7 +51,8 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add package.json package-lock.json Cargo.toml Cargo.lock tree-sitter.json
+          git add package.json package-lock.json Cargo.toml Cargo.lock tree-sitter.json src/parser.c
+          ./scripts/check-versions.sh --tag "v${{ steps.get_version.outputs.version }}"
           git commit -m "chore(release): v${{ steps.get_version.outputs.version }}"
           git tag "v${{ steps.get_version.outputs.version }}"
           git push origin HEAD --tags

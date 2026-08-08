@@ -5,10 +5,42 @@ set -euo pipefail
 REPOS_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$REPOS_DIR"
 
+EXPECTED_TAG=""
 AUTO_FIX=false
-if [[ "${1:-}" == "--fix" ]]; then
-  AUTO_FIX=true
+
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --fix)
+      AUTO_FIX=true
+      shift
+      ;;
+    --tag|--version)
+      EXPECTED_TAG="$2"
+      shift 2
+      ;;
+    *)
+      if [[ "$1" == --* ]]; then
+        echo "Unknown option: $1"
+        exit 1
+      fi
+      EXPECTED_TAG="$1"
+      shift
+      ;;
+  esac
+done
+
+# Infer tag/expected version from GitHub Actions or environment if not explicitly passed
+if [[ -z "$EXPECTED_TAG" ]]; then
+  if [[ "${GITHUB_REF_TYPE:-}" == "tag" && -n "${GITHUB_REF_NAME:-}" ]]; then
+    EXPECTED_TAG="$GITHUB_REF_NAME"
+  elif [[ "${GITHUB_REF:-}" == refs/tags/* ]]; then
+    EXPECTED_TAG="${GITHUB_REF#refs/tags/}"
+  elif [[ -n "${TAG:-}" ]]; then
+    EXPECTED_TAG="$TAG"
+  fi
 fi
+
+CLEAN_TAG="${EXPECTED_TAG#v}"
 
 # Extract versions from manifest, lock, and generated parser files
 PKG_VER=$(jq -r '.version // empty' package.json 2>/dev/null || echo "")
@@ -33,15 +65,21 @@ if [[ -z "$PKG_VER" || "$PKG_LOCK_VER1" != "$PKG_VER" || "$PKG_LOCK_VER2" != "$P
   MISMATCH=true
 fi
 
+if [[ -n "$CLEAN_TAG" && "$PKG_VER" != "$CLEAN_TAG" ]]; then
+  MISMATCH=true
+fi
+
 if [[ "$MISMATCH" == "true" ]]; then
   if [[ "$AUTO_FIX" == "true" ]]; then
-    echo "Attempting to fix version mismatches..."
-    npx tree-sitter version "$PKG_VER"
+    TARGET_VER="${CLEAN_TAG:-$PKG_VER}"
+    echo "Attempting to fix version mismatches (target: ${TARGET_VER})..."
+    npx tree-sitter version "$TARGET_VER"
     npx tree-sitter generate >/dev/null 2>&1 || true
     npm install --legacy-peer-deps --package-lock-only >/dev/null 2>&1 || true
     cargo check >/dev/null 2>&1 || true
     
     # Re-verify after fix
+    PKG_VER=$(jq -r '.version // empty' package.json 2>/dev/null || echo "")
     PKG_LOCK_VER1=$(jq -r '.version // empty' package-lock.json 2>/dev/null || echo "")
     PKG_LOCK_VER2=$(jq -r '.packages[""].version // empty' package-lock.json 2>/dev/null || echo "")
     TS_VER=$(jq -r '.metadata.version // .version // empty' tree-sitter.json 2>/dev/null || echo "")
@@ -57,18 +95,27 @@ if [[ "$MISMATCH" == "true" ]]; then
       PARSER_VER=""
     fi
 
+    MISMATCH=false
     if [[ "$PKG_LOCK_VER1" != "$PKG_VER" || "$PKG_LOCK_VER2" != "$PKG_VER" || "$TS_VER" != "$PKG_VER" || "$CARGO_VER" != "$PKG_VER" || "$CARGO_LOCK_VER" != "$PKG_VER" || "$PARSER_VER" != "$PKG_VER" ]]; then
-      echo "❌ Auto-fix failed to sync all version files."
       MISMATCH=true
+    fi
+    if [[ -n "$CLEAN_TAG" && "$PKG_VER" != "$CLEAN_TAG" ]]; then
+      MISMATCH=true
+    fi
+
+    if [[ "$MISMATCH" == "true" ]]; then
+      echo "❌ Auto-fix failed to sync all version files."
     else
       echo "✅ Versions successfully synchronized to $PKG_VER."
-      MISMATCH=false
     fi
   fi
 fi
 
 if [[ "$MISMATCH" == "true" ]]; then
-  echo "❌ Version mismatch detected across manifest, lock, and parser files!"
+  echo "❌ Version mismatch detected!"
+  if [[ -n "$CLEAN_TAG" ]]; then
+    echo "  Git tag:             ${EXPECTED_TAG} (expected version: ${CLEAN_TAG})"
+  fi
   echo "  package.json:        ${PKG_VER:-<missing>}"
   echo "  package-lock.json:   ${PKG_LOCK_VER1:-<missing>} (packages[\"\"]: ${PKG_LOCK_VER2:-<missing>})"
   echo "  tree-sitter.json:    ${TS_VER:-<missing>}"
@@ -76,8 +123,15 @@ if [[ "$MISMATCH" == "true" ]]; then
   echo "  Cargo.lock:          ${CARGO_LOCK_VER:-<missing>}"
   echo "  src/parser.c:        ${PARSER_VER:-<missing>}"
   echo ""
+  if [[ -n "$CLEAN_TAG" && "$PKG_VER" != "$CLEAN_TAG" ]]; then
+    echo "The git tag version (${CLEAN_TAG}) does not match the project version (${PKG_VER:-<missing>})."
+  fi
   echo "Please ensure all versions match. You can fix this by running:"
-  echo "  npx tree-sitter version <version>"
+  if [[ -n "$CLEAN_TAG" ]]; then
+    echo "  npx tree-sitter version $CLEAN_TAG"
+  else
+    echo "  npx tree-sitter version <version>"
+  fi
   echo "  or: npm run check-versions -- --fix"
   exit 1
 fi
@@ -112,4 +166,8 @@ if git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
   fi
 fi
 
-echo "✅ All version files (package.json, package-lock.json, tree-sitter.json, Cargo.toml, Cargo.lock, src/parser.c) are consistent (${PKG_VER})."
+if [[ -n "$CLEAN_TAG" ]]; then
+  echo "✅ All version files (package.json, package-lock.json, tree-sitter.json, Cargo.toml, Cargo.lock, src/parser.c) match git tag ${EXPECTED_TAG} (${PKG_VER})."
+else
+  echo "✅ All version files (package.json, package-lock.json, tree-sitter.json, Cargo.toml, Cargo.lock, src/parser.c) are consistent (${PKG_VER})."
+fi
