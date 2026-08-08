@@ -2438,9 +2438,7 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
     case 13:
       if (lookahead == '"') ADVANCE(245);
       if (lookahead == '\\') ADVANCE(38);
-      if (lookahead != 0 &&
-          lookahead != 0x17f &&
-          lookahead != 0x212a) ADVANCE(13);
+      if (lookahead != 0) ADVANCE(13);
       END_STATE();
     case 14:
       if (lookahead == '&') ADVANCE(81);
@@ -2466,21 +2464,15 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
       if (lookahead == '/') ADVANCE(19);
       if (('\t' <= lookahead && lookahead <= '\r') ||
           lookahead == ' ') ADVANCE(17);
-      if (lookahead != 0 &&
-          lookahead != 0x17f &&
-          lookahead != 0x212a) ADVANCE(18);
+      if (lookahead != 0) ADVANCE(18);
       END_STATE();
     case 18:
       if (lookahead == '*') ADVANCE(265);
-      if (lookahead != 0 &&
-          lookahead != 0x17f &&
-          lookahead != 0x212a) ADVANCE(18);
+      if (lookahead != 0) ADVANCE(18);
       END_STATE();
     case 19:
       if (lookahead == '*') ADVANCE(264);
-      if (lookahead != 0 &&
-          lookahead != 0x17f &&
-          lookahead != 0x212a) ADVANCE(18);
+      if (lookahead != 0) ADVANCE(18);
       END_STATE();
     case 20:
       if (lookahead == '-') ADVANCE(36);
@@ -2543,9 +2535,7 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
       END_STATE();
     case 38:
       if (lookahead != 0 &&
-          lookahead != '\n' &&
-          lookahead != 0x17f &&
-          lookahead != 0x212a) ADVANCE(13);
+          lookahead != '\n') ADVANCE(13);
       END_STATE();
     case 39:
       if (eof) ADVANCE(40);
@@ -4111,17 +4101,13 @@ static bool ts_lex(TSLexer *lexer, TSStateId state) {
       ACCEPT_TOKEN(anon_sym_SLASH_STAR);
       if (lookahead == '*') ADVANCE(265);
       if (lookahead != 0 &&
-          lookahead != '/' &&
-          lookahead != 0x17f &&
-          lookahead != 0x212a) ADVANCE(18);
+          lookahead != '/') ADVANCE(18);
       END_STATE();
     case 265:
       ACCEPT_TOKEN(aux_sym_comment_token1);
       if (lookahead == '*') ADVANCE(265);
       if (lookahead != 0 &&
-          lookahead != '/' &&
-          lookahead != 0x17f &&
-          lookahead != 0x212a) ADVANCE(18);
+          lookahead != '/') ADVANCE(18);
       END_STATE();
     default:
       return false;
