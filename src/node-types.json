@@ -284,6 +284,10 @@
       "required": false,
       "types": [
         {
+          "type": "error",
+          "named": true
+        },
+        {
           "type": "identifier",
           "named": true
         }
@@ -300,6 +304,10 @@
       "types": [
         {
           "type": "arg_list",
+          "named": true
+        },
+        {
+          "type": "error",
           "named": true
         },
         {
@@ -430,6 +438,10 @@
       "required": false,
       "types": [
         {
+          "type": "error",
+          "named": true
+        },
+        {
           "type": "identifier",
           "named": true
         }
@@ -485,6 +497,10 @@
       "types": [
         {
           "type": "codes",
+          "named": true
+        },
+        {
+          "type": "error",
           "named": true
         },
         {
@@ -605,6 +621,10 @@
       "required": true,
       "types": [
         {
+          "type": "error",
+          "named": true
+        },
+        {
           "type": "expression",
           "named": true
         },
@@ -627,6 +647,10 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "error",
+          "named": true
+        },
         {
           "type": "expression",
           "named": true
@@ -1498,6 +1522,10 @@
       "multiple": true,
       "required": true,
       "types": [
+        {
+          "type": "error",
+          "named": true
+        },
         {
           "type": "expression",
           "named": true

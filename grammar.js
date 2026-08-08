@@ -59,6 +59,7 @@ function makeExpression($, prefix = '', includeLength = false) {
     $.string,
     $.object,
     $.error,
+    alias($._keyword, $.error),
     ...(includeLength ? [$.length] : []),
     seq('(', expression, ')'),
   );
@@ -112,17 +113,20 @@ const makeUnaryExpression = expr => prec(12, choice(
 ));
 const makeRangeAccess = (expr, subscript) => prec(13, seq(expr, '[', subscript, '..', subscript, ']'));
 const makeIndexAccess = (expr, subscript) => prec(13, seq(expr, '[', subscript, ']'));
+const makeVariable = $ => choice($.identifier, alias($._keyword, $.error));
+
 const makeVerbCall = ($, expr, argList) => prec(13, choice(
-  seq(expr, ':', $.identifier, '(', optional(argList), ')'),
+  seq(expr, ':', makeVariable($), '(', optional(argList), ')'),
   seq(expr, ':', '(', expr, ')', '(', optional(argList), ')'),
-  seq('$', $.identifier, '(', optional(argList), ')'),
+  seq('$', makeVariable($), '(', optional(argList), ')'),
 ));
 const makePropAccess = ($, expr) => prec(13, choice(
-  seq('$', $.identifier),
-  seq(expr, '.', $.identifier),
+  seq('$', makeVariable($)),
+  seq(expr, '.', makeVariable($)),
   seq(expr, '.', '(', expr, ')'),
 ));
-const makeCallExpression = ($, argList) => prec(13, seq($.identifier, '(', optional(argList), ')'));
+
+const makeCallExpression = ($, argList) => prec(13, seq(makeVariable($), '(', optional(argList), ')'));
 const makeArgList = argItem => seq(argItem, repeat(seq(',', argItem)));
 const makeArgItem = ($, expr) => choice(
   expr,
@@ -131,10 +135,10 @@ const makeArgItem = ($, expr) => choice(
 
 const makeScatterList = ($, expr) => seq(makeScatterItem($, expr), repeat(seq(',', makeScatterItem($, expr))));
 const makeScatterItem = ($, expr) => choice(
-  $.identifier,
-  seq('@', $.identifier),
-  seq('?', $.identifier),
-  seq('?', $.identifier, '=', expr),
+  makeVariable($),
+  seq('@', makeVariable($)),
+  seq('?', makeVariable($)),
+  seq('?', makeVariable($), '=', expr),
 );
 
 const makeListLiteral = argList => seq('{', optional(argList), '}');
@@ -143,9 +147,27 @@ const makeCatchExpression = (expr, codes) => seq('`', expr, '!', codes, optional
 module.exports = grammar({
   name: 'lambdamoo',
 
+  word: $ => $.identifier,
+
   conflicts: $ => [
     [$.expression, $.scatter_list],
     [$._subscript_expression, $._subscript_scatter_list],
+    [$._keyword, $.break_statement],
+    [$._keyword, $.continue_statement],
+    [$._keyword, $.return_statement],
+    [$._keyword, $.if_statement],
+    [$._keyword, $.elseif_clause],
+    [$._keyword, $.else_clause],
+    [$._keyword, $.for_statement],
+    [$._keyword, $.while_statement],
+    [$._keyword, $.fork_statement],
+    [$._keyword, $.try_statement],
+    [$._keyword, $.except_clause],
+    [$._keyword, $.codes],
+    [$.else_clause],
+    [$.elseif_clause],
+    [$.except_clause],
+    [$._keyword, $._subscript_codes],
   ],
 
   extras: $ => [
@@ -192,24 +214,24 @@ module.exports = grammar({
     ),
 
     for_statement: $ => choice(
-      seq('for', $.identifier, 'in', '(', $.expression, ')', repeat($.statement), 'endfor'),
-      seq('for', $.identifier, 'in', '[', $.expression, '..', $.expression, ']', repeat($.statement), 'endfor'),
+      seq('for', makeVariable($), 'in', '(', $.expression, ')', repeat($.statement), 'endfor'),
+      seq('for', makeVariable($), 'in', '[', $.expression, '..', $.expression, ']', repeat($.statement), 'endfor'),
     ),
 
     while_statement: $ => seq(
-      'while', optional($.identifier), '(', $.expression, ')',
+      'while', optional(makeVariable($)), '(', $.expression, ')',
       repeat($.statement),
       'endwhile',
     ),
 
     fork_statement: $ => seq(
-      'fork', optional($.identifier), '(', $.expression, ')',
+      'fork', optional(makeVariable($)), '(', $.expression, ')',
       repeat($.statement),
       'endfork',
     ),
 
-    break_statement: $ => seq('break', optional($.identifier), ';'),
-    continue_statement: $ => seq('continue', optional($.identifier), ';'),
+    break_statement: $ => seq('break', optional(makeVariable($)), ';'),
+    continue_statement: $ => seq('continue', optional(makeVariable($)), ';'),
     return_statement: $ => seq('return', optional($.expression), ';'),
 
     try_statement: $ => choice(
@@ -218,7 +240,7 @@ module.exports = grammar({
     ),
 
     except_clause: $ => seq(
-      'except', optional($.identifier), '(', $.codes, ')',
+      'except', optional(makeVariable($)), '(', $.codes, ')',
       repeat($.statement),
     ),
 
@@ -234,12 +256,12 @@ module.exports = grammar({
 
     // Level 1: Assignment (Right associative)
     assignment: $ => makeAssignment(
-      choice($.identifier, $.prop_access, $.index_access),
+      choice(makeVariable($), $.prop_access, $.index_access),
       $.expression,
     ),
     _subscript_assignment: $ => makeAssignment(
       choice(
-        $.identifier,
+        makeVariable($),
         asPublic($._subscript_prop_access, $.prop_access),
         asPublic($._subscript_index_access, $.index_access),
       ),
@@ -302,7 +324,17 @@ module.exports = grammar({
     ),
 
     // --- Primitives / Literals ---
-    identifier: $ => /[a-zA-Z_][a-zA-Z0-9_]*/,
+    _keyword: $ => prec.dynamic(-1, choice(
+      'if', 'elseif', 'else', 'endif',
+      'for', 'in', 'endfor',
+      'while', 'endwhile',
+      'fork', 'endfork',
+      'break', 'continue', 'return',
+      'try', 'except', 'finally', 'endtry',
+      'ANY',
+    )),
+
+    identifier: $ => token(/[a-zA-Z_][a-zA-Z0-9_]*/),
     number: $ => /[0-9]+(\.[0-9]+)?/,
     string: $ => /"([^"\\]|\\.)*"/,
     object: $ => /#-?[0-9]+/,
