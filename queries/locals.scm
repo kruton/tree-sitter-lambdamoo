@@ -12,6 +12,9 @@
 (assignment
   (identifier) @local.definition)
 
+(scattering_assignment
+  (scatter_list) @local.scatter)
+
 (for_statement
   (identifier) @local.definition)
 
