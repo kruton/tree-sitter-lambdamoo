@@ -86,7 +86,7 @@ notify(if);
           (arg_list
             (arg_item
               (expression
-                (error)))))))))
+                (invalid_identifier)))))))))
 
 ==================
 Keyword in For Loop Variable
@@ -100,7 +100,7 @@ endfor
 (source_file
   (statement
     (for_statement
-      (error)
+      (invalid_identifier)
       (expression
         (identifier)))))
 
@@ -119,7 +119,7 @@ me.if;
         (prop_access
           (expression
             (identifier))
-          (error))))))
+          (invalid_identifier))))))
 
 ==================
 Keyword in Direct Verb Call
@@ -136,4 +136,21 @@ me:if();
         (verb_call
           (expression
             (identifier))
-          (error))))))
+          (invalid_identifier))))))
+
+==================
+Error Literal Is Not an Invalid Identifier
+==================
+
+result = E_NONE;
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (assignment
+          (identifier)
+          (expression
+            (error)))))))

@@ -55,4 +55,28 @@ mod tests {
             .set_language(&super::LANGUAGE.into())
             .expect("Error loading LambdaMOO parser");
     }
+
+    #[test]
+    fn test_errors_query_captures_invalid_identifier_only() {
+        use tree_sitter::StreamingIterator;
+
+        let language = super::LANGUAGE.into();
+        let mut parser = tree_sitter::Parser::new();
+        parser.set_language(&language).unwrap();
+        let source = "notify(if); result = E_NONE;";
+        let tree = parser.parse(source, None).unwrap();
+
+        assert!(!tree.root_node().has_error());
+
+        let query = tree_sitter::Query::new(&language, super::ERRORS_QUERY).unwrap();
+        let mut cursor = tree_sitter::QueryCursor::new();
+        let mut captures = cursor.captures(&query, tree.root_node(), source.as_bytes());
+        let capture_names = query.capture_names();
+        let mut captured = Vec::new();
+        while let Some((query_match, capture_index)) = captures.next() {
+            captured.push(capture_names[query_match.captures[*capture_index].index as usize]);
+        }
+
+        assert_eq!(captured, ["invalid_identifier"]);
+    }
 }

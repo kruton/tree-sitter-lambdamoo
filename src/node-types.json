@@ -40,6 +40,10 @@
           "named": true
         },
         {
+          "type": "invalid_identifier",
+          "named": true
+        },
+        {
           "type": "length",
           "named": true
         },
@@ -142,6 +146,10 @@
           "named": true
         },
         {
+          "type": "invalid_identifier",
+          "named": true
+        },
+        {
           "type": "length",
           "named": true
         },
@@ -229,6 +237,10 @@
           "named": true
         },
         {
+          "type": "invalid_identifier",
+          "named": true
+        },
+        {
           "type": "length",
           "named": true
         },
@@ -284,11 +296,11 @@
       "required": false,
       "types": [
         {
-          "type": "error",
+          "type": "identifier",
           "named": true
         },
         {
-          "type": "identifier",
+          "type": "invalid_identifier",
           "named": true
         }
       ]
@@ -307,11 +319,11 @@
           "named": true
         },
         {
-          "type": "error",
+          "type": "identifier",
           "named": true
         },
         {
-          "type": "identifier",
+          "type": "invalid_identifier",
           "named": true
         }
       ]
@@ -359,6 +371,10 @@
         },
         {
           "type": "index_access",
+          "named": true
+        },
+        {
+          "type": "invalid_identifier",
           "named": true
         },
         {
@@ -438,11 +454,11 @@
       "required": false,
       "types": [
         {
-          "type": "error",
+          "type": "identifier",
           "named": true
         },
         {
-          "type": "identifier",
+          "type": "invalid_identifier",
           "named": true
         }
       ]
@@ -500,11 +516,11 @@
           "named": true
         },
         {
-          "type": "error",
+          "type": "identifier",
           "named": true
         },
         {
-          "type": "identifier",
+          "type": "invalid_identifier",
           "named": true
         },
         {
@@ -552,6 +568,10 @@
         },
         {
           "type": "index_access",
+          "named": true
+        },
+        {
+          "type": "invalid_identifier",
           "named": true
         },
         {
@@ -621,15 +641,15 @@
       "required": true,
       "types": [
         {
-          "type": "error",
-          "named": true
-        },
-        {
           "type": "expression",
           "named": true
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "invalid_identifier",
           "named": true
         },
         {
@@ -648,15 +668,15 @@
       "required": true,
       "types": [
         {
-          "type": "error",
-          "named": true
-        },
-        {
           "type": "expression",
           "named": true
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "invalid_identifier",
           "named": true
         },
         {
@@ -734,6 +754,10 @@
           "named": true
         },
         {
+          "type": "invalid_identifier",
+          "named": true
+        },
+        {
           "type": "length",
           "named": true
         },
@@ -779,6 +803,11 @@
         }
       ]
     }
+  },
+  {
+    "type": "invalid_identifier",
+    "named": true,
+    "fields": {}
   },
   {
     "type": "length",
@@ -838,6 +867,10 @@
         },
         {
           "type": "index_access",
+          "named": true
+        },
+        {
+          "type": "invalid_identifier",
           "named": true
         },
         {
@@ -925,6 +958,10 @@
         },
         {
           "type": "index_access",
+          "named": true
+        },
+        {
+          "type": "invalid_identifier",
           "named": true
         },
         {
@@ -1030,6 +1067,10 @@
           "named": true
         },
         {
+          "type": "invalid_identifier",
+          "named": true
+        },
+        {
           "type": "length",
           "named": true
         },
@@ -1114,6 +1155,10 @@
         },
         {
           "type": "index_access",
+          "named": true
+        },
+        {
+          "type": "invalid_identifier",
           "named": true
         },
         {
@@ -1271,6 +1316,10 @@
           "named": true
         },
         {
+          "type": "invalid_identifier",
+          "named": true
+        },
+        {
           "type": "length",
           "named": true
         },
@@ -1377,6 +1426,10 @@
           "named": true
         },
         {
+          "type": "invalid_identifier",
+          "named": true
+        },
+        {
           "type": "length",
           "named": true
         },
@@ -1468,6 +1521,10 @@
           "named": true
         },
         {
+          "type": "invalid_identifier",
+          "named": true
+        },
+        {
           "type": "length",
           "named": true
         },
@@ -1523,15 +1580,15 @@
       "required": true,
       "types": [
         {
-          "type": "error",
-          "named": true
-        },
-        {
           "type": "expression",
           "named": true
         },
         {
           "type": "identifier",
+          "named": true
+        },
+        {
+          "type": "invalid_identifier",
           "named": true
         },
         {

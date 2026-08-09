@@ -59,7 +59,7 @@ function makeExpression($, prefix = '', includeLength = false) {
     $.string,
     $.object,
     $.error,
-    alias($._keyword, $.error),
+    $.invalid_identifier,
     ...(includeLength ? [$.length] : []),
     seq('(', expression, ')'),
   );
@@ -113,7 +113,7 @@ const makeUnaryExpression = expr => prec(12, choice(
 ));
 const makeRangeAccess = (expr, subscript) => prec(13, seq(expr, '[', subscript, '..', subscript, ']'));
 const makeIndexAccess = (expr, subscript) => prec(13, seq(expr, '[', subscript, ']'));
-const makeVariable = $ => choice($.identifier, alias($._keyword, $.error));
+const makeVariable = $ => choice($.identifier, $.invalid_identifier);
 
 const makeVerbCall = ($, expr, argList) => prec(13, choice(
   seq(expr, ':', makeVariable($), '(', optional(argList), ')'),
@@ -334,6 +334,7 @@ module.exports = grammar({
       'ANY',
     )),
 
+    invalid_identifier: $ => $._keyword,
     identifier: $ => token(/[a-zA-Z_][a-zA-Z0-9_]*/),
     number: $ => /[0-9]+(\.[0-9]+)?/,
     string: $ => /"([^"\\]|\\.)*"/,

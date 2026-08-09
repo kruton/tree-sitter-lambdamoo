@@ -8,4 +8,5 @@
 (MISSING "}") @missing_brace
 (MISSING "'") @missing_single_quote
 (MISSING ";") @missing_semicolon
+(invalid_identifier) @invalid_identifier
 (ERROR) @error
