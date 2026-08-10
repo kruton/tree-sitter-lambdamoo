@@ -27,6 +27,7 @@ const EXPRESSION_RULES = [
   'range_access',
   'index_access',
   'verb_call',
+  'system_verb_call',
   'prop_access',
   'call_expression',
   'catch_expression',
@@ -116,9 +117,22 @@ const makeIndexAccess = (expr, subscript) => prec(13, seq(expr, '[', subscript, 
 const makeVariable = $ => choice($.identifier, $.invalid_identifier);
 
 const makeVerbCall = ($, expr, argList) => prec(13, choice(
-  seq(expr, ':', makeVariable($), '(', optional(argList), ')'),
-  seq(expr, ':', '(', expr, ')', '(', optional(argList), ')'),
-  seq('$', makeVariable($), '(', optional(argList), ')'),
+  seq(
+    field('receiver', expr),
+    ':',
+    field('verb', makeVariable($)),
+    '(', field('arguments', optional(argList)), ')',
+  ),
+  seq(
+    field('receiver', expr),
+    ':',
+    '(', field('verb', expr), ')',
+    '(', field('arguments', optional(argList)), ')',
+  ),
+));
+const makeSystemVerbCall = ($, argList) => prec(13, seq(
+  '$', field('verb', makeVariable($)),
+  '(', field('arguments', optional(argList)), ')',
 ));
 const makePropAccess = ($, expr) => prec(13, choice(
   seq('$', makeVariable($)),
@@ -126,7 +140,10 @@ const makePropAccess = ($, expr) => prec(13, choice(
   seq(expr, '.', '(', expr, ')'),
 ));
 
-const makeCallExpression = ($, argList) => prec(13, seq(makeVariable($), '(', optional(argList), ')'));
+const makeCallExpression = ($, argList) => prec(13, seq(
+  field('function', makeVariable($)),
+  '(', field('arguments', optional(argList)), ')',
+));
 const makeArgList = argItem => seq(argItem, repeat(seq(',', argItem)));
 const makeArgItem = ($, expr) => choice(
   expr,
@@ -299,7 +316,14 @@ module.exports = grammar({
     _subscript_index_access: $ => makeIndexAccess($._subscript_expression, $._subscript_expression),
 
     verb_call: $ => makeVerbCall($, $.expression, $.arg_list),
-    _subscript_verb_call: $ => makeVerbCall($, $._subscript_expression, asPublic($._subscript_arg_list, $.arg_list)),
+    _subscript_verb_call: $ => makeVerbCall(
+      $,
+      asPublic($._subscript_expression, $.expression),
+      asPublic($._subscript_arg_list, $.arg_list),
+    ),
+
+    system_verb_call: $ => makeSystemVerbCall($, $.arg_list),
+    _subscript_system_verb_call: $ => makeSystemVerbCall($, asPublic($._subscript_arg_list, $.arg_list)),
 
     prop_access: $ => makePropAccess($, $.expression),
     _subscript_prop_access: $ => makePropAccess($, $._subscript_expression),

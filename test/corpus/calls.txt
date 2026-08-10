@@ -1,0 +1,175 @@
+==================
+Function Call
+==================
+
+notify(player, "hi!");
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (call_expression
+          function: (identifier)
+          arguments: (arg_list
+            (arg_item
+              (expression
+                (identifier)))
+            (arg_item
+              (expression
+                (string)))))))))
+
+==================
+Static Verb Call
+==================
+
+player:tell("hi!");
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (verb_call
+          receiver: (expression
+            (identifier))
+          verb: (identifier)
+          arguments: (arg_list
+            (arg_item
+              (expression
+                (string)))))))))
+
+==================
+Dynamic Verb Call
+==================
+
+player:(verb_name)("hi!");
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (verb_call
+          receiver: (expression
+            (identifier))
+          verb: (expression
+            (identifier))
+          arguments: (arg_list
+            (arg_item
+              (expression
+                (string)))))))))
+
+==================
+Property Receiver Verb Call
+==================
+
+$system:notify(player, "hi!");
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (verb_call
+          receiver: (expression
+            (prop_access
+              (identifier)))
+          verb: (identifier)
+          arguments: (arg_list
+            (arg_item
+              (expression
+                (identifier)))
+            (arg_item
+              (expression
+                (string)))))))))
+
+==================
+System Verb Call
+==================
+
+$verb(player);
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (system_verb_call
+          verb: (identifier)
+          arguments: (arg_list
+            (arg_item
+              (expression
+                (identifier)))))))))
+
+==================
+Calls Without Arguments
+==================
+
+time();
+player:look();
+$verb();
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (call_expression
+          function: (identifier)))))
+  (statement
+    (expression_statement
+      (expression
+        (verb_call
+          receiver: (expression
+            (identifier))
+          verb: (identifier)))))
+  (statement
+    (expression_statement
+      (expression
+        (system_verb_call
+          verb: (identifier))))))
+
+==================
+Calls In Subscripts
+==================
+
+x[notify()];
+x[player:look()];
+x[$verb()];
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (index_access
+          (expression
+            (identifier))
+          (call_expression
+            function: (identifier))))))
+  (statement
+    (expression_statement
+      (expression
+        (index_access
+          (expression
+            (identifier))
+          (verb_call
+            receiver: (expression
+              (identifier))
+            verb: (identifier))))))
+  (statement
+    (expression_statement
+      (expression
+        (index_access
+          (expression
+            (identifier))
+          (system_verb_call
+            verb: (identifier)))))))
