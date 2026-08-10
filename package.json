@@ -1,6 +1,6 @@
 {
   "name": "tree-sitter-lambdamoo",
-  "version": "0.1.7",
+  "version": "0.2.0",
   "description": "LambdaMOO grammar for tree-sitter",
   "repository": {
     "type": "git",
