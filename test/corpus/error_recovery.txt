@@ -154,3 +154,18 @@ result = E_NONE;
           (identifier)
           (expression
             (error)))))))
+
+==================
+C-Style Comments Are Invalid
+==================
+
+/* this is invalid */
+
+---
+
+(source_file
+  (ERROR
+    (identifier)
+    (identifier)
+    (expression
+      (identifier))))
