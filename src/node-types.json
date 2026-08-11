@@ -463,12 +463,6 @@
     }
   },
   {
-    "type": "comment",
-    "named": true,
-    "extra": true,
-    "fields": {}
-  },
-  {
     "type": "continue_statement",
     "named": true,
     "fields": {},
@@ -1698,10 +1692,6 @@
   },
   {
     "type": "/",
-    "named": false
-  },
-  {
-    "type": "/*",
     "named": false
   },
   {

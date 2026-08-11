@@ -22,5 +22,3 @@
 (string) @string
 (object) @constant
 (error) @constant
-
-(comment) @comment
