@@ -272,7 +272,12 @@ module.exports = grammar({
 
     // Level 1: Assignment (Right associative)
     assignment: $ => makeAssignment(
-      choice(makeVariable($), $.prop_access, $.index_access),
+      choice(
+        makeVariable($),
+        $.prop_access,
+        $.index_access,
+        $.range_access,
+      ),
       $.expression,
     ),
     _subscript_assignment: $ => makeAssignment(
@@ -280,6 +285,7 @@ module.exports = grammar({
         makeVariable($),
         asPublic($._subscript_prop_access, $.prop_access),
         asPublic($._subscript_index_access, $.index_access),
+        asPublic($._subscript_range_access, $.range_access),
       ),
       $._subscript_expression,
     ),

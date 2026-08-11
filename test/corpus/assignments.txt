@@ -21,6 +21,184 @@ Scattering Assignment with Optional and Rest Variables
             (identifier)))))))
 
 ==================
+Range Access Assignment Targets
+==================
+
+args[2..1] = {this};
+text[1..4] = "";
+text[$..$] = {};
+text[start + 1..length(text)] = replacement;
+matrix[index][1..count] = {};
+this.values[4..$] = {};
+items[1..0] = {new_item};
+items[length(items)..length(items) - 1] = {new_item};
+
+try
+  word[1..match(word, "%w")[1] - 1] = "";
+except (E_RANGE)
+  "DWI";
+endtry
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (assignment
+          (range_access
+            (expression
+              (identifier))
+            (number)
+            (number))
+          (expression
+            (list_literal
+              (arg_list
+                (arg_item
+                  (expression
+                    (identifier))))))))))
+  (statement
+    (expression_statement
+      (expression
+        (assignment
+          (range_access
+            (expression
+              (identifier))
+            (number)
+            (number))
+          (expression
+            (string))))))
+  (statement
+    (expression_statement
+      (expression
+        (assignment
+          (range_access
+            (expression
+              (identifier))
+            (length)
+            (length))
+          (expression
+            (list_literal))))))
+  (statement
+    (expression_statement
+      (expression
+        (assignment
+          (range_access
+            (expression
+              (identifier))
+            (binary_expression
+              (identifier)
+              (number))
+            (call_expression
+              (identifier)
+              (arg_list
+                (arg_item
+                  (identifier)))))
+          (expression
+            (identifier))))))
+  (statement
+    (expression_statement
+      (expression
+        (assignment
+          (range_access
+            (expression
+              (index_access
+                (expression
+                  (identifier))
+                (identifier)))
+            (number)
+            (identifier))
+          (expression
+            (list_literal))))))
+  (statement
+    (expression_statement
+      (expression
+        (assignment
+          (range_access
+            (expression
+              (prop_access
+                (expression
+                  (identifier))
+                (identifier)))
+            (number)
+            (length))
+          (expression
+            (list_literal))))))
+  (statement
+    (expression_statement
+      (expression
+        (assignment
+          (range_access
+            (expression
+              (identifier))
+            (number)
+            (number))
+          (expression
+            (list_literal
+              (arg_list
+                (arg_item
+                  (expression
+                    (identifier))))))))))
+  (statement
+    (expression_statement
+      (expression
+        (assignment
+          (range_access
+            (expression
+              (identifier))
+            (call_expression
+              (identifier)
+              (arg_list
+                (arg_item
+                  (identifier))))
+            (binary_expression
+              (call_expression
+                (identifier)
+                (arg_list
+                  (arg_item
+                    (identifier))))
+              (number)))
+          (expression
+            (list_literal
+              (arg_list
+                (arg_item
+                  (expression
+                    (identifier))))))))))
+  (statement
+    (try_statement
+      (statement
+        (expression_statement
+          (expression
+            (assignment
+              (range_access
+                (expression
+                  (identifier))
+                (number)
+                (binary_expression
+                  (index_access
+                    (call_expression
+                      (identifier)
+                      (arg_list
+                        (arg_item
+                          (identifier))
+                        (arg_item
+                          (string))))
+                    (number))
+                  (number)))
+              (expression
+                (string))))))
+      (except_clause
+        (codes
+          (arg_list
+            (arg_item
+              (expression
+                (error)))))
+        (statement
+          (expression_statement
+            (expression
+              (string))))))))
+
+==================
 Scattering Assignment with Optional Default
 ==================
 
