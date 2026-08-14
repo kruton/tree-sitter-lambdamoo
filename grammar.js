@@ -76,9 +76,9 @@ function makeBinaryExpression(expr) {
   // Precedence order matching LambdaMOO parser.y (lines 106-117):
   // Level 1 (loosest precedence):  || &&
   // Level 2:                       == != < <= > >= in
-  // Level 3:                       |.
-  // Level 4:                       ^.
-  // Level 5:                       &.
+  // Level 3:                       .|.
+  // Level 4:                       .^.
+  // Level 5:                       .&.
   // Level 6:                       << >> >>>
   // Level 7:                       + -
   // Level 8:                       * / %
@@ -87,9 +87,9 @@ function makeBinaryExpression(expr) {
     [prec.left, 1, choice('||', '&&')],
     [prec.left, 2, choice('==', '!=', '<', '<=', '>', '>=')],
     [prec.left, 2, 'in'],
-    [prec.left, 3, '|.'],
-    [prec.left, 4, '^.'],
-    [prec.left, 5, '&.'],
+    [prec.left, 3, '.|.'],
+    [prec.left, 4, '.^.'],
+    [prec.left, 5, '.&.'],
     [prec.left, 6, choice('<<', '>>', '>>>')],
     [prec.left, 7, choice('+', '-')],
     [prec.left, 8, choice('*', '/', '%')],
