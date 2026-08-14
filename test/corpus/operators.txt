@@ -2,7 +2,7 @@
 Bitwise OR vs Equals Precedence
 ==================
 
-a |. b == c;
+a .|. b == c;
 
 ---
 
@@ -19,6 +19,34 @@ a |. b == c;
                 (identifier))))
           (expression
             (identifier)))))))
+
+==================
+Bitwise Operators and Complement
+==================
+
+a .|. b .^. c .&. ~d;
+
+---
+
+(source_file
+  (statement
+    (expression_statement
+      (expression
+        (binary_expression
+          (expression
+            (identifier))
+          (expression
+            (binary_expression
+              (expression
+                (identifier))
+              (expression
+                (binary_expression
+                  (expression
+                    (identifier))
+                  (expression
+                    (unary_expression
+                      (expression
+                        (identifier)))))))))))))
 
 ==================
 Logical OR vs Logical AND Equal Precedence
