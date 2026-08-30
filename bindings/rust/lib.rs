@@ -74,7 +74,7 @@ mod tests {
         let capture_names = query.capture_names();
         let mut captured = Vec::new();
         while let Some((query_match, capture_index)) = captures.next() {
-            captured.push(capture_names[query_match.captures[*capture_index].index as usize]);
+            captured.push(capture_names[query_match.captures()[*capture_index].index as usize]);
         }
 
         assert_eq!(captured, ["invalid_identifier"]);
